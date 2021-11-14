@@ -70,6 +70,26 @@ async function run() {
             const result = await usersCollection.insertOne(user);
         });
 
+        // update API
+        app.put('/bikes/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateBike = req.body;
+            const filter = { _id: ObjectId(id) };
+
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    bike_name: updateBike.bike_name,
+                    image: updateBike.image,
+                    short_des: updateBike.short_des,
+                    brand: updateBike.brand,
+                    price: updateBike.price
+                }
+            }
+            const result = await bikesCollection.updateOne(filter, updateDoc, options);
+            res.json(result);
+        })
+
         app.put('/users', async (req, res) => {
             const user = req.body;
             const filter = { email: user.email };
@@ -82,8 +102,6 @@ async function run() {
         app.put('/orders/:id', async (req, res) => {
             const id = req.params.id;
             const updateOrder = req.body;
-            console.log(id);
-            console.log(updateOrder);
 
             const filter = { _id: ObjectId(id) };
             const options = { upsert: true };
