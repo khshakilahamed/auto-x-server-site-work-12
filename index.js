@@ -47,6 +47,15 @@ async function run() {
             const cursor = ordersCollection.find(query);
             const orders = await cursor.toArray();
             res.send(orders)
+        });
+
+        app.post('/bikes', async (req, res) => {
+            const newBike = req.body;
+            // console.log(newBike);
+            const addNewBike = newBike;
+            const result = await bikesCollection.insertOne(addNewBike);
+            console.log(result);
+            res.json(result);
         })
 
         app.post('/orders', async (req, res) => {
@@ -95,6 +104,14 @@ async function run() {
             const result = await ordersCollection.updateOne(filter, updateDoc, options);
 
             res.send(result);
+        })
+
+        app.delete('/bikes/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await bikesCollection.deleteOne(query);
+            console.log(result);
+            res.json(result);
         })
 
         app.delete('/orders/:id', async (req, res) => {
