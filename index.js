@@ -22,12 +22,57 @@ async function run() {
 
         const database = client.db('bikeShop');
         const bikesCollection = database.collection('bikes');
+        const ordersCollection = database.collection('orders');
+        const usersCollection = database.collection('users');
 
         app.get('/bikes', async (req, res) => {
             const cursor = bikesCollection.find({});
             const result = await cursor.toArray();
-            console.log(result);
+            // console.log(result);
             res.send(result);
+        });
+
+        app.get('/bikes/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await bikesCollection.findOne(query);
+
+            res.send(result);
+        });
+
+        app.get('/orders/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { userEmail: email };
+
+            const cursor = ordersCollection.find(query);
+            const orders = await cursor.toArray();
+            res.send(orders)
+        })
+
+        app.post('/orders', async (req, res) => {
+            const order = req.body;
+            const doc = order;
+            const result = await ordersCollection.insertOne(doc);
+            res.json(result);
+        });
+
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
+        });
+        app.put('/users', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const options = { upsert: true };
+            const updateDoc = { $set: user };
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.json(result);
+        });
+        app.delete('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await ordersCollection.deleteOne(query);
+            res.json(result);
         })
 
     }
