@@ -41,17 +41,24 @@ async function run() {
             res.send(result);
         });
 
-        app.get('/orders/:email', async (req, res) => {
-            const email = req.params.email;
-            const query = { userEmail: email };
-
-            const cursor = ordersCollection.find(query);
+        app.get('/orders', async (req, res) => {
+            const cursor = ordersCollection.find({});
             const orders = await cursor.toArray();
             res.send(orders)
         });
 
-        // post API
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email }
+            const user = await usersCollection.findOne(query);
+            let isAdmin = false;
+            if (user?.role === 'admin') {
+                isAdmin = true;
+            }
+            res.json({ admin: isAdmin });
+        })
 
+        // post API
         app.post('/bikes', async (req, res) => {
             const newBike = req.body;
             // console.log(newBike);
@@ -59,7 +66,7 @@ async function run() {
             const result = await bikesCollection.insertOne(addNewBike);
             console.log(result);
             res.json(result);
-        })
+        });
 
         app.post('/orders', async (req, res) => {
             const order = req.body;
