@@ -25,6 +25,7 @@ async function run() {
         const ordersCollection = database.collection('orders');
         const usersCollection = database.collection('users');
 
+        // get API
         app.get('/bikes', async (req, res) => {
             const cursor = bikesCollection.find({});
             const result = await cursor.toArray();
@@ -49,6 +50,8 @@ async function run() {
             res.send(orders)
         });
 
+        // post API
+
         app.post('/bikes', async (req, res) => {
             const newBike = req.body;
             // console.log(newBike);
@@ -68,6 +71,7 @@ async function run() {
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
+            res.send(result)
         });
 
         // update API
@@ -99,6 +103,14 @@ async function run() {
             res.json(result);
         });
 
+        app.put('/users/admin', async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const updateDoc = { $set: { role: 'admin' } }
+            const result = await usersCollection.updateOne(filter, updateDoc);
+            res.json(result);
+        })
+
         app.put('/orders/:id', async (req, res) => {
             const id = req.params.id;
             const updateOrder = req.body;
@@ -124,6 +136,7 @@ async function run() {
             res.send(result);
         })
 
+        // delete API
         app.delete('/bikes/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
